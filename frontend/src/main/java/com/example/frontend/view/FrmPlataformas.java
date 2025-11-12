@@ -2,47 +2,56 @@
 package com.example.frontend.view;
 
 import com.example.frontend.model.PlataformaDto;
-import com.example.frontend.service.PlataformaService;
-
+import com.example.frontend.service.HttpClientUtil;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 public class FrmPlataformas extends JFrame {
-
-    private JTable table;
     private DefaultTableModel model;
 
     public FrmPlataformas() {
         setTitle("Gestión de Plataformas");
-        setSize(800, 400);
+        setSize(800, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Modelo de la tabla
         model = new DefaultTableModel(
-                new String[]{"ID", "Nombre", "URL", "Estado"},
+                new String[]{"ID", "Nombre", "URL Oficial", "Estado"},
                 0
         );
-        table = new JTable(model);
+        JTable table = new JTable(model);
         table.setAutoCreateRowSorter(true);
-
         add(new JScrollPane(table), BorderLayout.CENTER);
-        JButton btnRefresh = new JButton("Actualizar");
-        btnRefresh.addActionListener(e -> cargarDatos());
-        add(btnRefresh, BorderLayout.SOUTH);
 
-        cargarDatos(); // Carga inicial
+        JPanel panel = new JPanel();
+        JButton btnCrear = new JButton("Crear");
+        JButton btnEditar = new JButton("Editar");
+        JButton btnEliminar = new JButton("Eliminar");
+        JButton btnActualizar = new JButton("Actualizar");
+
+        panel.add(btnCrear);
+        panel.add(btnEditar);
+        panel.add(btnEliminar);
+        panel.add(btnActualizar);
+        add(panel, BorderLayout.SOUTH);
+
+        btnCrear.addActionListener(e -> crear());
+        btnEditar.addActionListener(e -> editar(table));
+        btnEliminar.addActionListener(e -> eliminar(table));
+        btnActualizar.addActionListener(e -> cargarDatos(table));
+
+        cargarDatos(table);
     }
 
-    private void cargarDatos() {
-        model.setRowCount(0); // Limpia la tabla
+    private void cargarDatos(JTable table) {
         try {
-            PlataformaService service = new PlataformaService();
-            List<PlataformaDto> lista = service.listar();
-
+            PlataformaDto[] lista = HttpClientUtil.getArray(
+                    "http://localhost:8080/api/plataformas",
+                    PlataformaDto[].class
+            );
+            model.setRowCount(0);
             for (PlataformaDto p : lista) {
                 model.addRow(new Object[]{
                         p.getIdPlataforma(),
@@ -52,20 +61,103 @@ public class FrmPlataformas extends JFrame {
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this,
-                    "Error al cargar plataformas:\n" + e.getMessage(),
-                    "Error de Conexión",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar plataformas:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+    private void crear() {
+        JTextField txtNombre = new JTextField(20);
+        JTextField txtUrl = new JTextField(30);
+        JTextField txtEstado = new JTextField("Activo", 15);
+
+        Object[] msg = {
+                "Nombre:", txtNombre,
+                "URL Oficial:", txtUrl,
+                "Estado:", txtEstado
+        };
+
+        int opt = JOptionPane.showConfirmDialog(this, msg, "Crear Plataforma", JOptionPane.OK_CANCEL_OPTION);
+        if (opt == JOptionPane.OK_OPTION) {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception ignored) {}
-            new FrmPlataformas().setVisible(true);
-        });
+                PlataformaDto dto = new PlataformaDto();
+                dto.setNombre(txtNombre.getText());
+                dto.setUrlOficial(txtUrl.getText());
+                dto.setEstado(txtEstado.getText());
+
+                HttpClientUtil.post("http://localhost:8080/api/plataformas", dto, PlataformaDto.class);
+                JOptionPane.showMessageDialog(this, "Plataforma creada exitosamente");
+                cargarDatos(getTable());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al crear:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void editar(JTable table) {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione una plataforma", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Long id = (Long) model.getValueAt(row, 0);
+        String nombre = (String) model.getValueAt(row, 1);
+        String url = (String) model.getValueAt(row, 2);
+        String estado = (String) model.getValueAt(row, 3);
+
+        JTextField txtNombre = new JTextField(nombre, 20);
+        JTextField txtUrl = new JTextField(url, 30);
+        JTextField txtEstado = new JTextField(estado, 15);
+
+        Object[] msg = {
+                "Nombre:", txtNombre,
+                "URL Oficial:", txtUrl,
+                "Estado:", txtEstado
+        };
+
+        int opt = JOptionPane.showConfirmDialog(this, msg, "Editar Plataforma", JOptionPane.OK_CANCEL_OPTION);
+        if (opt == JOptionPane.OK_OPTION) {
+            try {
+                PlataformaDto dto = new PlataformaDto();
+                dto.setIdPlataforma(id);
+                dto.setNombre(txtNombre.getText());
+                dto.setUrlOficial(txtUrl.getText());
+                dto.setEstado(txtEstado.getText());
+
+                HttpClientUtil.put("http://localhost:8080/api/plataformas/" + id, dto, PlataformaDto.class);
+                JOptionPane.showMessageDialog(this, "Plataforma actualizada");
+                cargarDatos(table);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al actualizar:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void eliminar(JTable table) {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione una plataforma", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Long id = (Long) model.getValueAt(row, 0);
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Eliminar plataforma ID " + id + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                HttpClientUtil.delete("http://localhost:8080/api/plataformas/" + id);
+                JOptionPane.showMessageDialog(this, "Plataforma eliminada");
+                cargarDatos(table);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al eliminar:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private JTable getTable() {
+        return (JTable) ((JScrollPane) getContentPane().getComponent(0)).getViewport().getView();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new FrmPlataformas().setVisible(true));
     }
 }

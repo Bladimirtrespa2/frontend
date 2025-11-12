@@ -1,12 +1,17 @@
 // src/main/java/com/example/frontend/model/PerfilDto.java
 package com.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PerfilDto {
     private Long idPerfil;
     private String nombrePerfil;
     private String pin;
     private String estado;
     private Long idCuenta;
+
+    public PerfilDto() {}
 
     // Getters y Setters
     public Long getIdPerfil() { return idPerfil; }

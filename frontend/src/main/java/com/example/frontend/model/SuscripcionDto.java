@@ -1,7 +1,9 @@
 package com.example.frontend.model;
 
-public class SuscripcionDto {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true) // ⬅️ Esta línea lo soluciona
+public class SuscripcionDto {
     private Long idSuscripcion;
     private String fechaInicio;
     private String fechaFin;
@@ -9,6 +11,12 @@ public class SuscripcionDto {
     private Long idSuscriptor;
     private Long idPlataforma;
     private Double montoMensual;
+    // Añade este campo
+    private String timestamp;
+
+    // Y su getter/setter
+    public String getTimestamp() { return timestamp; }
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
     public Long getIdSuscripcion() {
         return idSuscripcion;

@@ -12,7 +12,7 @@ public class FrmCuentas extends JFrame {
 
     public FrmCuentas() {
         setTitle("Gestión de Cuentas");
-        setSize(900, 500);
+        setSize(950, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -66,6 +66,7 @@ public class FrmCuentas extends JFrame {
                 });
             }
         } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error al cargar cuentas:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

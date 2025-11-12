@@ -1,12 +1,18 @@
 // src/main/java/com/example/frontend/model/PagoDto.java
 package com.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true) // ⬅️ Esta línea lo soluciona
 public class PagoDto {
     private Long idPago;
-    private String fechaPago;      // Usamos String para simplificar (puedes usar LocalDate si lo deseas)
+    private String fechaPago;
     private Double montoPagado;
     private String metodoPago;
     private Long idSuscripcion;
+
+    // Constructor vacío
+    public PagoDto() {}
 
     // Getters y Setters
     public Long getIdPago() { return idPago; }

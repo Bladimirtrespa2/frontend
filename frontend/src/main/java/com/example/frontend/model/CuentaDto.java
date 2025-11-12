@@ -1,8 +1,10 @@
 // src/main/java/com/example/frontend/model/CuentaDto.java
 package com.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CuentaDto {
     private Long idCuenta;
     private String correoCuenta;
@@ -13,8 +15,11 @@ public class CuentaDto {
     private Long idPlataforma;
     private String nombrePlataforma;
     private Long idAdministrador;
+    private List<PerfilDto> perfiles; // ← Define la lista de perfiles
     private int perfilesOcupados;
-    private List<Object> perfiles; // Usamos Object porque no definimos PerfilDto aquí
+
+    // Constructor vacío (obligatorio para Jackson)
+    public CuentaDto() {}
 
     // Getters y Setters
     public Long getIdCuenta() { return idCuenta; }
@@ -44,9 +49,9 @@ public class CuentaDto {
     public Long getIdAdministrador() { return idAdministrador; }
     public void setIdAdministrador(Long idAdministrador) { this.idAdministrador = idAdministrador; }
 
+    public List<PerfilDto> getPerfiles() { return perfiles; }
+    public void setPerfiles(List<PerfilDto> perfiles) { this.perfiles = perfiles; }
+
     public int getPerfilesOcupados() { return perfilesOcupados; }
     public void setPerfilesOcupados(int perfilesOcupados) { this.perfilesOcupados = perfilesOcupados; }
-
-    public List<Object> getPerfiles() { return perfiles; }
-    public void setPerfiles(List<Object> perfiles) { this.perfiles = perfiles; }
 }

@@ -27,4 +27,17 @@ public class SuscriptorService {
         SuscriptorDto[] array = mapper.readValue(response.body(), SuscriptorDto[].class);
         return Arrays.asList(array);
     }
+    // En com.example.frontend.service.SuscriptorService
+    public void crear(SuscriptorDto dto) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String json = new ObjectMapper().writeValueAsString(dto);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/api/v1/suscriptores"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        // Si no lanza excepción, fue exitoso
+    }
 }

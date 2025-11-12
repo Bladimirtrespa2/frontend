@@ -6,8 +6,15 @@ public class SuscriptorDto {
     private String nombre;
     private String correo;
 
-    // Constructor vacío (obligatorio para Jackson)
+    // ✅ Constructor vacío (obligatorio para Jackson)
     public SuscriptorDto() {}
+
+    // Constructor con todos los campos
+    public SuscriptorDto(Long idSuscriptor, String nombre, String correo) {
+        this.idSuscriptor = idSuscriptor;
+        this.nombre = nombre;
+        this.correo = correo;
+    }
 
     // Getters y Setters
     public Long getIdSuscriptor() { return idSuscriptor; }

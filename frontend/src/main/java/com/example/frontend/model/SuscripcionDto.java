@@ -14,6 +14,8 @@ public class SuscripcionDto {
     // Añade este campo
     private String timestamp;
 
+    public SuscripcionDto(){}
+
     // Y su getter/setter
     public String getTimestamp() { return timestamp; }
     public void setTimestamp(String timestamp) { this.timestamp = timestamp; }

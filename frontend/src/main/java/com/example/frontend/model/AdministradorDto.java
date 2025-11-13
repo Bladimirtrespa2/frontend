@@ -8,6 +8,8 @@ public class AdministradorDto {
     private String contrasena;
     private String rol;
 
+    public AdministradorDto() {}
+
     // Getters y Setters
     public Long getIdAdministrador() { return idAdministrador; }
     public void setIdAdministrador(Long idAdministrador) { this.idAdministrador = idAdministrador; }
